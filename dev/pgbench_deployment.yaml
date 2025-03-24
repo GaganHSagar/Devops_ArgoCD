@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pgbench
+  namespace: keda-project
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pgbench
+  template:
+    metadata:
+      labels:
+        app: pgbench
+    spec:
+      containers:
+      - name: pgbench
+        image: gaganh/simple_app:pgbench
+        command: ["/bin/bash", "-c", "while true; do sleep 3600; done"]
+      imagePullSecrets:
+      - name: my-docker-secret
