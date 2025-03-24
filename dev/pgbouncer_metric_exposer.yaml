@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pgbouncer-metrics
+  namespace: keda-project
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pgbouncer-metrics
+  template:
+    metadata:
+      labels:
+        app: pgbouncer-metrics
+    spec:
+      containers:
+      - name: pgbouncer-metrics
+        image: gaganh/simple_app:final    # Replace image name with your docker image
+        ports:
+        - containerPort: 80
+        env:
+        - name: PGUSER
+          value: "admin"
+        - name: PGPASSWORD
+          value: "admin123"
+        - name: PGHOST
+          value: "pgbouncer.keda-project.svc.cluster.local"
+        - name: PGPORT
+          value: "5432"
+        - name: PGDATABASE
+          value: "pgbouncer"
+      imagePullSecrets:
+      - name: my-docker-secret     #Replce this with your docker-secret name
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pgbouncer-metrics
+  namespace: keda-project
+spec:
+  ports:
+  - port: 80
+    targetPort: 80
+  selector:
+    app: pgbouncer-metrics
